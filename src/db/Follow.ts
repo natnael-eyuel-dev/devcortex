@@ -19,11 +19,21 @@ const FollowSchema: Schema<IFollow> = new Schema({
 // ensure a user cannot follow the same person multiple times
 FollowSchema.index({ follower: 1, following: 1 }, { unique: true });
 
-FollowSchema.pre('save', function(next) {
-  if (this.follower.equals(this.following)) {
-    next(new Error('A user cannot follow themselves.'));
-  } else {
-    next();
+FollowSchema.pre('save', function (next) {
+  try {
+    const followerId = (this.follower instanceof mongoose.Types.ObjectId)
+      ? this.follower
+      : new mongoose.Types.ObjectId(this.follower);
+    const followingId = (this.following instanceof mongoose.Types.ObjectId)
+      ? this.following
+      : new mongoose.Types.ObjectId(this.following);
+
+    if (followerId.equals(followingId)) {
+      return next(new Error('A user cannot follow themselves.'));
+    }
+    return next();
+  } catch (e) {
+    return next(new Error('Invalid follower or following identifier.'));
   }
 });
 
