@@ -130,13 +130,15 @@ CourseSchema.index({ 'discussions.lessonIndex': 1 });
 
 // calculate average rating when ratings change
 CourseSchema.pre('save', function(next) {
-  if (this.ratings && this.ratings.length > 0) {
-    const totalRating = this.ratings.reduce((sum, rating) => sum + rating.rating, 0);
-    this.averageRating = totalRating / this.ratings.length;
-    this.totalRatings = this.ratings.length;
-  } else {
-    this.averageRating = 0;
-    this.totalRatings = 0;
+  if (this.isModified('ratings')) {
+    if (this.ratings && this.ratings.length > 0) {
+      const totalRating = this.ratings.reduce((sum, rating) => sum + rating.rating, 0);
+      this.averageRating = totalRating / this.ratings.length;
+      this.totalRatings = this.ratings.length;
+    } else {
+      this.averageRating = 0;
+      this.totalRatings = 0;
+    }
   }
   next();
 });
