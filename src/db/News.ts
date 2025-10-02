@@ -26,15 +26,6 @@ export interface INews extends Document {
     bookmarks: mongoose.Types.ObjectId[];
     views: number;
   };
-  comments: Array<{
-    id: string;
-    author: mongoose.Types.ObjectId;
-    content: string;
-    createdAt: Date;
-    parentId?: string;
-    mentions: string[];
-    likes: mongoose.Types.ObjectId[];
-  }>;
   aiSummary?: string;
   readingTime: number;
   createdAt: Date;
@@ -71,15 +62,6 @@ const NewsSchema: Schema<INews> = new Schema({
     bookmarks: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     views: { type: Number, default: 0 }
   },
-  comments: [{
-    id: { type: String, required: true },
-    author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    content: { type: String, required: true },
-    createdAt: { type: Date, default: Date.now },
-    parentId: { type: String },
-    mentions: [{ type: String }],
-    likes: [{ type: Schema.Types.ObjectId, ref: 'User' }]
-  }],
   aiSummary: { type: String },
   readingTime: { type: Number, default: 0 },
 }, {
