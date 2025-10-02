@@ -25,13 +25,6 @@ export interface ICourse extends Document {
     metaDescription?: string;
     keywords?: string[];
   };
-  enrollments?: Array<{
-    userId: mongoose.Types.ObjectId;
-    enrolledAt: Date;
-    completedAt?: Date;
-    progress: number;
-    lastAccessedAt?: Date;
-  }>;
   ratings?: Array<{
     userId: mongoose.Types.ObjectId;
     rating: number;
@@ -40,17 +33,6 @@ export interface ICourse extends Document {
   }>;
   averageRating?: number;
   totalRatings?: number;
-  discussions?: Array<{
-    id: string;
-    userId: mongoose.Types.ObjectId;
-    content: string;
-    parentId?: string;
-    lessonIndex?: number;
-    createdAt: Date;
-    likes: mongoose.Types.ObjectId[];
-    replies: string[];
-    isInstructor: boolean;
-  }>;
 }
 
 // course schema definition
@@ -80,15 +62,6 @@ const CourseSchema: Schema<ICourse> = new Schema({
     metaDescription: { type: String },
     keywords: [{ type: String }],
   },
-  enrollments: [
-    {
-      userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-      enrolledAt: { type: Date, default: Date.now },
-      completedAt: { type: Date },
-      progress: { type: Number, default: 0 },
-      lastAccessedAt: { type: Date, default: Date.now },
-    },
-  ],
   ratings: [
     {
       userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
@@ -99,19 +72,6 @@ const CourseSchema: Schema<ICourse> = new Schema({
   ],
   averageRating: { type: Number, default: 0 },
   totalRatings: { type: Number, default: 0 },
-  discussions: [
-    {
-      id: { type: String, required: true },
-      userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-      content: { type: String, required: true },
-      parentId: { type: String },
-      lessonIndex: { type: Number },
-      createdAt: { type: Date, default: Date.now },
-      likes: [{ type: Schema.Types.ObjectId, ref: 'User' }],
-      replies: [{ type: String }],
-      isInstructor: { type: Boolean, default: false },
-    },
-  ],
 }, {
   timestamps: true,
 });
@@ -124,9 +84,6 @@ CourseSchema.index({ title: 'text', description: 'text' });
 CourseSchema.index({ author: 1 });
 CourseSchema.index({ status: 1 });
 CourseSchema.index({ category: 1 });
-CourseSchema.index({ 'enrollments.userId': 1 });
-CourseSchema.index({ 'discussions.userId': 1 });
-CourseSchema.index({ 'discussions.lessonIndex': 1 });
 
 // calculate average rating when ratings change
 CourseSchema.pre('save', function(next) {

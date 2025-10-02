@@ -9,11 +9,6 @@ export interface IArticle extends Document {
   coverImage?: string;
   tags: string[];
   author: mongoose.Types.ObjectId;
-  comments: Array<{
-    user: mongoose.Types.ObjectId;
-    comment: string;
-    createdAt: Date;
-  }>;
   likes: number;
   views: number;
 }
@@ -27,13 +22,6 @@ const ArticleSchema: Schema<IArticle> = new Schema({
   coverImage: { type: String },
   tags: [{ type: String }],
   author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-  comments: [
-    {
-      user: { type: Schema.Types.ObjectId, ref: 'User' },
-      comment: { type: String },
-      createdAt: { type: Date, default: Date.now },
-    },
-  ],
   likes: { type: Number, default: 0 },
   views: { type: Number, default: 0 },
 });

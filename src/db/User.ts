@@ -33,8 +33,6 @@ export interface IUser extends Document {
   endorsements?: Array<{ fromUser: string; message: string; date: Date }>;
   certificates?: Array<{ type: string; imageUrl: string; isNFT?: boolean }>;
   badges?: Array<{ name: string; icon: string; date: Date }>;
-  followers?: Array<string>;
-  following?: Array<string>;
   recentActivity?: Array<{ type: string; refId?: string; date: Date; description?: string; milestone?: boolean }>;
   joinedAt: Date;
   lastLoginAt?: Date;
@@ -125,8 +123,6 @@ const UserSchema: Schema<IUser> = new Schema({
       date: { type: Date },
     },
   ],
-  followers: [{ type: String }],
-  following: [{ type: String }],
   recentActivity: [
     {
       type: { type: String },

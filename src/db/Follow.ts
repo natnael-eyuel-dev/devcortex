@@ -1,0 +1,40 @@
+import mongoose, { Schema, Document, Model } from 'mongoose';
+
+// follow interface
+export interface IFollow extends Document {
+  follower: mongoose.Types.ObjectId;
+  following: mongoose.Types.ObjectId;
+  followedAt: Date;
+}
+
+// follow schema definition
+const FollowSchema: Schema<IFollow> = new Schema({
+  follower: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+  following: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+  followedAt: { type: Date, default: Date.now },
+}, {
+  timestamps: true,
+});
+
+// ensure a user cannot follow the same person multiple times
+FollowSchema.index({ follower: 1, following: 1 }, { unique: true });
+
+FollowSchema.pre('save', function (next) {
+  try {
+    const followerId = (this.follower instanceof mongoose.Types.ObjectId)
+      ? this.follower
+      : new mongoose.Types.ObjectId(this.follower);
+    const followingId = (this.following instanceof mongoose.Types.ObjectId)
+      ? this.following
+      : new mongoose.Types.ObjectId(this.following);
+
+    if (followerId.equals(followingId)) {
+      return next(new Error('A user cannot follow themselves.'));
+    }
+    return next();
+  } catch (e) {
+    return next(new Error('Invalid follower or following identifier.'));
+  }
+});
+
+export const Follow: Model<IFollow> = mongoose.models.Follow || mongoose.model<IFollow>('Follow', FollowSchema);
