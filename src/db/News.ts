@@ -97,15 +97,15 @@ NewsSchema.index({ 'engagement.bookmarks': 1 });
 // pre-save hook to generate slug and calculate reading time
 NewsSchema.pre('save', function(next) {
   if (this.isModified('title') && !this.slug) {
-    this.slug = this.title
+    this.slug = String(this.title || '')
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/(^-|-$)/g, '');
   }
   
   if (this.isModified('content')) {
-    // calculate reading time (average 200 words per minute)
-    const wordCount = this.content.split(/\s+/).length;
+    const contentStr = typeof this.content === 'string' ? this.content : '';
+    const wordCount = contentStr.trim() ? contentStr.trim().split(/\s+/).length : 0;
     this.readingTime = Math.ceil(wordCount / 200);
   }
   
