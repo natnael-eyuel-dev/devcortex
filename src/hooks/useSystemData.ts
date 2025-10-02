@@ -38,8 +38,8 @@ export function useSystemData() {
   // initial fetch on mount
   useEffect(() => {
     if (session?.user) {
-      fetchSystemData();
-      setLoading(false);
+      setLoading(true);
+      fetchSystemData().finally(() => setLoading(false));
     }
   }, [session]);
 
