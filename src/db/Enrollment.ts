@@ -16,7 +16,7 @@ const EnrollmentSchema: Schema<IEnrollment> = new Schema({
   userId: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
   enrolledAt: { type: Date, default: Date.now },
   completedAt: { type: Date },
-  progress: { type: Number, default: 0 },
+  progress: { type: Number, default: 0, min: 0, max: 100 },
   lastAccessedAt: { type: Date, default: Date.now },
 }, {
   timestamps: true,
@@ -24,5 +24,16 @@ const EnrollmentSchema: Schema<IEnrollment> = new Schema({
 
 // ensure a user cannot enroll in the same course multiple times
 EnrollmentSchema.index({ courseId: 1, userId: 1 }, { unique: true });
+
+// temporal and progress validation
+EnrollmentSchema.pre('save', function(next) {
+  if (this.completedAt && this.enrolledAt && this.completedAt < this.enrolledAt) {
+    return next(new Error('completedAt cannot be earlier than enrolledAt.'));
+  }
+  if (typeof this.progress === 'number' && (this.progress < 0 || this.progress > 100)) {
+    return next(new Error('progress must be between 0 and 100.'));
+  }
+  return next();
+});
 
 export const Enrollment: Model<IEnrollment> = mongoose.models.Enrollment || mongoose.model<IEnrollment>('Enrollment', EnrollmentSchema);
