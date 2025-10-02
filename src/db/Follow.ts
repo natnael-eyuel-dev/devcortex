@@ -19,4 +19,12 @@ const FollowSchema: Schema<IFollow> = new Schema({
 // ensure a user cannot follow the same person multiple times
 FollowSchema.index({ follower: 1, following: 1 }, { unique: true });
 
+FollowSchema.pre('save', function(next) {
+  if (this.follower.equals(this.following)) {
+    next(new Error('A user cannot follow themselves.'));
+  } else {
+    next();
+  }
+});
+
 export const Follow: Model<IFollow> = mongoose.models.Follow || mongoose.model<IFollow>('Follow', FollowSchema);
